@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	orderedmap "github.com/wk8/go-ordered-map/v2"
 	"reflect"
 )
 
@@ -15,54 +16,55 @@ import (
 //
 // Core schema meta-schema.
 type Schema struct {
-	ID                   *string                                     `json:"$id,omitempty"`     // Format: uri-reference.
-	Schema               *string                                     `json:"$schema,omitempty"` // Format: uri.
-	Ref                  *string                                     `json:"$ref,omitempty"`    // Format: uri-reference.
-	Comment              *string                                     `json:"$comment,omitempty"`
-	Title                *string                                     `json:"title,omitempty"`
-	Description          *string                                     `json:"description,omitempty"`
-	Default              *interface{}                                `json:"default,omitempty"`
-	ReadOnly             *bool                                       `json:"readOnly,omitempty"`
-	Examples             []interface{}                               `json:"examples,omitempty"`
-	MultipleOf           *float64                                    `json:"multipleOf,omitempty"`
-	Maximum              *float64                                    `json:"maximum,omitempty"`
-	ExclusiveMaximum     *float64                                    `json:"exclusiveMaximum,omitempty"`
-	Minimum              *float64                                    `json:"minimum,omitempty"`
-	ExclusiveMinimum     *float64                                    `json:"exclusiveMinimum,omitempty"`
-	MaxLength            *int64                                      `json:"maxLength,omitempty"`
-	MinLength            int64                                       `json:"minLength,omitempty"`
-	Pattern              *string                                     `json:"pattern,omitempty"`         // Format: regex.
-	AdditionalItems      *SchemaOrBool                               `json:"additionalItems,omitempty"` // Core schema meta-schema.
-	Items                *Items                                      `json:"items,omitempty"`
-	MaxItems             *int64                                      `json:"maxItems,omitempty"`
-	MinItems             int64                                       `json:"minItems,omitempty"`
-	UniqueItems          *bool                                       `json:"uniqueItems,omitempty"`
-	Contains             *SchemaOrBool                               `json:"contains,omitempty"` // Core schema meta-schema.
-	MaxProperties        *int64                                      `json:"maxProperties,omitempty"`
-	MinProperties        int64                                       `json:"minProperties,omitempty"`
-	Required             []string                                    `json:"required,omitempty"`
-	AdditionalProperties *SchemaOrBool                               `json:"additionalProperties,omitempty"` // Core schema meta-schema.
-	Definitions          map[string]SchemaOrBool                     `json:"definitions,omitempty"`
-	Properties           map[string]SchemaOrBool                     `json:"properties,omitempty"`
-	PatternProperties    map[string]SchemaOrBool                     `json:"patternProperties,omitempty"`
-	Dependencies         map[string]DependenciesAdditionalProperties `json:"dependencies,omitempty"`
-	PropertyNames        *SchemaOrBool                               `json:"propertyNames,omitempty"` // Core schema meta-schema.
-	Const                *interface{}                                `json:"const,omitempty"`
-	Enum                 []interface{}                               `json:"enum,omitempty"`
-	Type                 *Type                                       `json:"type,omitempty"`
-	Format               *string                                     `json:"format,omitempty"`
-	ContentMediaType     *string                                     `json:"contentMediaType,omitempty"`
-	ContentEncoding      *string                                     `json:"contentEncoding,omitempty"`
-	If                   *SchemaOrBool                               `json:"if,omitempty"`   // Core schema meta-schema.
-	Then                 *SchemaOrBool                               `json:"then,omitempty"` // Core schema meta-schema.
-	Else                 *SchemaOrBool                               `json:"else,omitempty"` // Core schema meta-schema.
-	AllOf                []SchemaOrBool                              `json:"allOf,omitempty"`
-	AnyOf                []SchemaOrBool                              `json:"anyOf,omitempty"`
-	OneOf                []SchemaOrBool                              `json:"oneOf,omitempty"`
-	Not                  *SchemaOrBool                               `json:"not,omitempty"` // Core schema meta-schema.
-	ExtraProperties      map[string]interface{}                      `json:"-"`             // All unmatched properties.
-	ReflectType          reflect.Type                                `json:"-"`
-	Parent               *Schema                                     `json:"-"`
+	ID                   *string                 `json:"$id,omitempty"`     // Format: uri-reference.
+	Schema               *string                 `json:"$schema,omitempty"` // Format: uri.
+	Ref                  *string                 `json:"$ref,omitempty"`    // Format: uri-reference.
+	Comment              *string                 `json:"$comment,omitempty"`
+	Title                *string                 `json:"title,omitempty"`
+	Description          *string                 `json:"description,omitempty"`
+	Default              *interface{}            `json:"default,omitempty"`
+	ReadOnly             *bool                   `json:"readOnly,omitempty"`
+	Examples             []interface{}           `json:"examples,omitempty"`
+	MultipleOf           *float64                `json:"multipleOf,omitempty"`
+	Maximum              *float64                `json:"maximum,omitempty"`
+	ExclusiveMaximum     *float64                `json:"exclusiveMaximum,omitempty"`
+	Minimum              *float64                `json:"minimum,omitempty"`
+	ExclusiveMinimum     *float64                `json:"exclusiveMinimum,omitempty"`
+	MaxLength            *int64                  `json:"maxLength,omitempty"`
+	MinLength            int64                   `json:"minLength,omitempty"`
+	Pattern              *string                 `json:"pattern,omitempty"`         // Format: regex.
+	AdditionalItems      *SchemaOrBool           `json:"additionalItems,omitempty"` // Core schema meta-schema.
+	Items                *Items                  `json:"items,omitempty"`
+	MaxItems             *int64                  `json:"maxItems,omitempty"`
+	MinItems             int64                   `json:"minItems,omitempty"`
+	UniqueItems          *bool                   `json:"uniqueItems,omitempty"`
+	Contains             *SchemaOrBool           `json:"contains,omitempty"` // Core schema meta-schema.
+	MaxProperties        *int64                  `json:"maxProperties,omitempty"`
+	MinProperties        int64                   `json:"minProperties,omitempty"`
+	Required             []string                `json:"required,omitempty"`
+	AdditionalProperties *SchemaOrBool           `json:"additionalProperties,omitempty"` // Core schema meta-schema.
+	Definitions          map[string]SchemaOrBool `json:"definitions,omitempty"`
+	//Properties           map[string]SchemaOrBool                     `json:"properties,omitempty"`
+	Properties        *orderedmap.OrderedMap[string, SchemaOrBool] `json:"properties,omitempty"`
+	PatternProperties map[string]SchemaOrBool                      `json:"patternProperties,omitempty"`
+	Dependencies      map[string]DependenciesAdditionalProperties  `json:"dependencies,omitempty"`
+	PropertyNames     *SchemaOrBool                                `json:"propertyNames,omitempty"` // Core schema meta-schema.
+	Const             *interface{}                                 `json:"const,omitempty"`
+	Enum              []interface{}                                `json:"enum,omitempty"`
+	Type              *Type                                        `json:"type,omitempty"`
+	Format            *string                                      `json:"format,omitempty"`
+	ContentMediaType  *string                                      `json:"contentMediaType,omitempty"`
+	ContentEncoding   *string                                      `json:"contentEncoding,omitempty"`
+	If                *SchemaOrBool                                `json:"if,omitempty"`   // Core schema meta-schema.
+	Then              *SchemaOrBool                                `json:"then,omitempty"` // Core schema meta-schema.
+	Else              *SchemaOrBool                                `json:"else,omitempty"` // Core schema meta-schema.
+	AllOf             []SchemaOrBool                               `json:"allOf,omitempty"`
+	AnyOf             []SchemaOrBool                               `json:"anyOf,omitempty"`
+	OneOf             []SchemaOrBool                               `json:"oneOf,omitempty"`
+	Not               *SchemaOrBool                                `json:"not,omitempty"` // Core schema meta-schema.
+	ExtraProperties   map[string]interface{}                       `json:"-"`             // All unmatched properties.
+	ReflectType       reflect.Type                                 `json:"-"`
+	Parent            *Schema                                      `json:"-"`
 }
 
 // WithID sets ID value.
@@ -282,18 +284,23 @@ func (s *Schema) WithDefinitionsItem(key string, val SchemaOrBool) *Schema {
 
 // WithProperties sets Properties value.
 func (s *Schema) WithProperties(val map[string]SchemaOrBool) *Schema {
-	s.Properties = val
+	if s.Properties == nil {
+		s.Properties = orderedmap.New[string, SchemaOrBool](
+			orderedmap.WithCapacity[string, SchemaOrBool](len(val)),
+		)
+	}
+	for k, v := range val {
+		s.Properties.Set(k, v)
+	}
 	return s
 }
 
 // WithPropertiesItem sets Properties item value.
 func (s *Schema) WithPropertiesItem(key string, val SchemaOrBool) *Schema {
 	if s.Properties == nil {
-		s.Properties = make(map[string]SchemaOrBool, 1)
+		s.Properties = orderedmap.New[string, SchemaOrBool]()
 	}
-
-	s.Properties[key] = val
-
+	s.Properties.Set(key, val)
 	return s
 }
 

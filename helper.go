@@ -247,9 +247,9 @@ func (s Schema) IsTrivial(refResolvers ...func(string) (SchemaOrBool, bool)) boo
 		return false
 	}
 
-	if len(s.Properties) > 0 {
-		for _, ps := range s.Properties {
-			if !ps.IsTrivial(refResolvers...) {
+	if s.Properties.Len() > 0 {
+		for pair := s.Properties.Oldest(); pair != nil; pair = pair.Next() {
+			if !pair.Value.IsTrivial(refResolvers...) {
 				return false
 			}
 		}

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	orderedmap "github.com/wk8/go-ordered-map/v2"
 	"path"
 	"reflect"
 	"regexp"
@@ -1200,12 +1201,12 @@ func (r *Reflector) walkProperties(v reflect.Value, parent *Schema, rc *ReflectC
 		}
 
 		if parent.Properties == nil {
-			parent.Properties = make(map[string]SchemaOrBool, 1)
+			parent.Properties = orderedmap.New[string, SchemaOrBool]()
 		}
 
-		parent.Properties[propName] = SchemaOrBool{
+		parent.Properties.Set(propName, SchemaOrBool{
 			TypeObject: &propertySchema,
-		}
+		})
 	}
 
 	return nil
@@ -1321,7 +1322,7 @@ func checkNullability(propertySchema *Schema, rc *ReflectContext, ft reflect.Typ
 	}
 
 	if propertySchema.HasType(Array) ||
-		(propertySchema.HasType(Object) && len(propertySchema.Properties) == 0 && propertySchema.Ref == nil) {
+		(propertySchema.HasType(Object) && (propertySchema.Properties == nil || propertySchema.Properties.Len() == 0) && propertySchema.Ref == nil) {
 		propertySchema.AddType(Null)
 
 		in.NullAdded = true

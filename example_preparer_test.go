@@ -21,7 +21,8 @@ var _ jsonschema.Preparer = Preparer{}
 
 func (s Preparer) PrepareJSONSchema(schema *jsonschema.Schema) error {
 	schema.WithDescription("Custom description.")
-	schema.Properties["foo"].TypeObject.WithEnum("one", "two", "three")
+	v, _ := schema.Properties.Get("foo")
+	v.TypeObject.WithEnum("one", "two", "three")
 
 	return nil
 }

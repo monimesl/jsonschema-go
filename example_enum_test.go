@@ -32,7 +32,8 @@ type Shop struct {
 var _ jsonschema.Preparer = Shop{}
 
 func (Shop) PrepareJSONSchema(schema *jsonschema.Schema) error {
-	schema.Properties["days2"].TypeObject.WithEnum(
+	v, _ := schema.Properties.Get("days2")
+	v.TypeObject.WithEnum(
 		"Monday",
 		"Tuesday",
 		"Wednesday",
