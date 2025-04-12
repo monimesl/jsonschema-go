@@ -1033,8 +1033,9 @@ func (r *Reflector) walkProperties(v reflect.Value, parent *Schema, rc *ReflectC
 		}
 
 		deepIndirect := refl.DeepIndirect(field.Type)
+		propName := strings.Split(tag, ",")[0]
 
-		if tag == "" && field.Anonymous &&
+		if propName == "" && field.Anonymous &&
 			(field.Type.Kind() == reflect.Struct || deepIndirect.Kind() == reflect.Struct) {
 			forceReference := (field.Type.Implements(typeOfEmbedReferencer) && field.Tag.Get("refer") == "") ||
 				field.Tag.Get("refer") == "true"
@@ -1090,7 +1091,6 @@ func (r *Reflector) walkProperties(v reflect.Value, parent *Schema, rc *ReflectC
 			continue
 		}
 
-		propName := strings.Split(tag, ",")[0]
 		omitEmpty := strings.Contains(tag, ",omitempty")
 		required := false
 
